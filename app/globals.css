@@ -240,6 +240,10 @@
   @apply flex h-[78px] flex-col justify-center rounded-xl border border-light-300 px-4 shadow-drop-1;
 }
 
+.shad-otp-slot {
+  @apply text-[40px] font-medium rounded-xl ring-brand shadow-drop-1 text-brand-100 justify-center flex border-2 border-light-300 size-12 md:size-16 gap-5
+}
+
 @layer base {
   * {
     @apply border-border outline-ring/50;
