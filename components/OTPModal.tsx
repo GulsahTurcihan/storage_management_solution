@@ -42,7 +42,6 @@ const OTPModal = ({
     console.log({ accountId, password });
 
     try {
-      //Call API to verify OTP
       const sessionId = await verifySecret({ accountId, password });
       console.log(sessionId);
 
@@ -52,8 +51,6 @@ const OTPModal = ({
     }
     setIsLoading(false);
   };
-
-  //Call API to resend OTP
 
   const handleResendOTP = async () => {
     await sendEmailOTP({ email });
@@ -96,6 +93,7 @@ const OTPModal = ({
             <AlertDialogAction
               onClick={handleSubmit}
               className="bg-brand btn hover:bg-brand-100 transition-all rounded-full h-12 cursor-pointer"
+              type="button"
             >
               Submit{" "}
               {isLoading && (

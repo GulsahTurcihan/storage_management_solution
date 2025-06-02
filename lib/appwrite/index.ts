@@ -4,7 +4,33 @@ import { Account, Avatars, Client, Databases, Storage } from "node-appwrite";
 import { appwriteConfig } from "./config";
 import { cookies } from "next/headers";
 
-export const createSessionClient = async () => {
+type Result<T> = { success: true; data: T } | { success: false; error: Error };
+
+export const createSessionClient = async (): Promise<
+  Result<{ account: Account; databases: Databases }>
+> => {
+  const client = new Client()
+    .setEndpoint(appwriteConfig.endpointURL as string)
+    .setProject(appwriteConfig.projectID as string);
+
+  const session = (await cookies()).get("appwrite-session");
+
+  if (!session || !session.value) {
+    return { success: false, error: new Error("Session not found") };
+  }
+
+  client.setSession(session.value);
+
+  return {
+    success: true,
+    data: {
+      account: new Account(client),
+      databases: new Databases(client),
+    },
+  };
+};
+
+/*export const createSessionClient = async () => {
   const client = new Client()
     .setEndpoint(appwriteConfig.endpointURL as string) // Your API Endpoint
     .setProject(appwriteConfig.projectID as string); // Your project ID
@@ -24,9 +50,16 @@ export const createSessionClient = async () => {
       return new Databases(client);
     },
   };
-};
+};*/
 
-export const createAdminClient = async () => {
+export const createAdminClient = async (): Promise<
+  Result<{
+    account: Account;
+    databases: Databases;
+    storage: Storage;
+    avatars: Avatars;
+  }>
+> => {
   if (!appwriteConfig.secretKey) {
     throw new Error("Secret key is missing");
   }
@@ -36,17 +69,12 @@ export const createAdminClient = async () => {
     .setKey(appwriteConfig.secretKey as string); // Your secret key
 
   return {
-    get account() {
-      return new Account(client);
-    },
-    get databases() {
-      return new Databases(client);
-    },
-    get storage() {
-      return new Storage(client);
-    },
-    get avatar() {
-      return new Avatars(client);
+    success: true,
+    data: {
+      account: new Account(client),
+      databases: new Databases(client),
+      storage: new Storage(client),
+      avatars: new Avatars(client),
     },
   };
 };

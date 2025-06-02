@@ -17,7 +17,7 @@ import Link from "next/link";
 import { useState } from "react";
 import Image from "next/image";
 import loader from "@/public/assets/icons/loader.svg";
-import { createAccount } from "@/lib/action/user.actions";
+import { createAccount, signInUser } from "@/lib/action/user.actions";
 import OTPModal from "./OTPModal";
 
 type FormType = "sign-in" | "sign-up";
@@ -61,7 +61,8 @@ const AuthForm = ({ type }: { type: FormType }) => {
               fullName: values.fullName || "",
               email: values.email,
             })
-          : null;
+          : await signInUser({ email: values.email });
+      console.log(user);
 
       setAccountId(user.accountId);
     } catch {
