@@ -87,19 +87,22 @@ const AuthForm = ({ type }: { type: FormType }) => {
               control={form.control}
               name="fullName"
               render={({ field }) => (
-                <FormItem className="flex h-[78px] flex-col justify-center border border-light-300 rounded-xl shadow-drop-1 px-4">
-                  <FormLabel className="text-light-100 font-normal text-[14px] leading-[20px] pt-2 w-full">
-                    Full name
-                  </FormLabel>
-                  <FormControl>
-                    <Input
-                      placeholder="Enter your full name"
-                      {...field}
-                      className="placeholder:text-light-200 shadow-none border-none outline-none p-0 focus-visible:border-0 focus-visible:ring-0 focus-visible:ring-transparent focus-visible:outline-none focus-visible:ring-offset-0 focus-visible:ring-offset-transparent"
-                    />
-                  </FormControl>
+                <FormItem>
+                  <div className="flex h-[78px] flex-col justify-center border border-light-300 rounded-xl shadow-drop-1 px-4">
+                    <FormLabel className="text-light-100 font-normal text-[14px] leading-[20px] pt-2 w-full">
+                      Full name
+                    </FormLabel>
+                    <FormControl>
+                      <Input
+                        autoComplete="off"
+                        placeholder="Enter your full name"
+                        {...field}
+                        className="placeholder:text-light-200 shadow-none border-none outline-none p-0 focus-visible:border-0 focus-visible:ring-0 focus-visible:ring-transparent focus-visible:outline-none focus-visible:ring-offset-0 focus-visible:ring-offset-transparent"
+                      />
+                    </FormControl>
 
-                  <FormMessage />
+                    <FormMessage />
+                  </div>
                 </FormItem>
               )}
             />

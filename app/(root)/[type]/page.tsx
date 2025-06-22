@@ -4,11 +4,13 @@ import { getFiles } from "@/lib/action/file.actions";
 import { getFileTypesParams } from "@/lib/utils";
 import { Models } from "node-appwrite";
 
-const page = async ({ params }: SearchParamProps) => {
+const page = async ({ params, searchParams }: SearchParamProps) => {
   const type = ((await params)?.type as string) || "";
+  const searchText = ((await searchParams)?.query as string) || "";
+  const sort = ((await searchParams)?.sort as string) || "";
 
   const types = getFileTypesParams(type) as FileType[];
-  const files = await getFiles({ types }); // const response = await fetch ("api", {cache: "no-store"}); const files: FileListResponse = await response.json()
+  const files = await getFiles({ types, sort, searchText }); // const response = await fetch ("api", {cache: "no-store"}); const files: FileListResponse = await response.json()
 
   return (
     <div className="mx-auto flex w-ful max-w-7xl flex-col items-center gap-8">

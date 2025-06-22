@@ -1,6 +1,6 @@
 "use server";
 
-import { createAdminClient } from "../appwrite";
+import { createAdminClient, createSessionClient } from "../appwrite";
 import { InputFile } from "node-appwrite/file";
 import { appwriteConfig } from "../appwrite/config";
 import { ID, Models, Query } from "node-appwrite";
@@ -63,7 +63,13 @@ export const uploadFile = async ({
   return parseStringify(newFile);
 };
 
-const createQueries = (currentUser: Models.Document, types: string[]) => {
+const createQueries = (
+  currentUser: Models.Document,
+  types: string[],
+  searchText: string,
+  sort: string,
+  limit?: number
+) => {
   //Appwrite'dan gelen kullanıcı nesnesidir
   const queries = [
     Query.or([
@@ -73,13 +79,24 @@ const createQueries = (currentUser: Models.Document, types: string[]) => {
   ]; // Sonuç: Sadece kullanıcıya ait (ya doğrudan sahibi ya da kullanıcı listesinde yer alıyorsa) belgeleri çeker
 
   if (types.length > 0) queries.push(Query.equal("type", types));
+  if (searchText) queries.push(Query.contains("name", searchText));
+  if (limit) queries.push(Query.limit(limit));
+  if (sort) {
+    const [sortBy, orderBy] = sort.split("-");
+    queries.push(
+      orderBy === "asc" ? Query.orderAsc(sortBy) : Query.orderDesc(sortBy)
+    );
+  }
 
   return queries;
-
-  // TO DO: search, sort, limits
 };
 
-export const getFiles = async ({ types = [] }: GetFilesProps) => {
+export const getFiles = async ({
+  types = [],
+  searchText = "",
+  sort = `$createdAt-desc`,
+  limit,
+}: GetFilesProps) => {
   const adminClient = await createAdminClient();
 
   if (!adminClient.success) {
@@ -92,7 +109,7 @@ export const getFiles = async ({ types = [] }: GetFilesProps) => {
   const currentUser = await getCurrentUser();
   if (!currentUser) throw new Error("User not found");
 
-  const queries = createQueries(currentUser, types); //createQueries fonksiyonu çağrılarak kullanıcıya özel sorgular hazırlanır.
+  const queries = createQueries(currentUser, types, searchText, sort, limit); //createQueries fonksiyonu çağrılarak kullanıcıya özel sorgular hazırlanır.
   console.log({ currentUser, queries });
 
   const files = await databases.listDocuments(
@@ -194,3 +211,47 @@ export const deleteFile = async ({
 
   return true;
 };
+
+// ============================== TOTAL FILE SPACE USED
+
+export async function getTotalSpaceUsed() {
+  const sessionClient = await createSessionClient();
+
+  if (!sessionClient.success) {
+    console.log(sessionClient.error);
+    return false;
+  }
+
+  const { databases } = sessionClient.data;
+  const currentUser = await getCurrentUser();
+
+  const files = await databases.listDocuments(
+    appwriteConfig.databaseID as string,
+    appwriteConfig.fileCollectionID as string,
+    [Query.equal("owner", [currentUser.$id])]
+  );
+
+  const totalSpace = {
+    image: { size: 0, latestDate: "" },
+    document: { size: 0, latestDate: "" },
+    video: { size: 0, latestDate: "" },
+    audio: { size: 0, latestDate: "" },
+    other: { size: 0, latestDate: "" },
+    used: 0,
+    all: 2 * 1024 * 1024 * 1024 /* 2GB available bucket storage */,
+  };
+
+  files.documents.forEach((file) => {
+    const fileType = file.type as FileType;
+    totalSpace[fileType].size += file.size;
+    totalSpace.used += file.size;
+
+    if (
+      !totalSpace[fileType].latestDate ||
+      new Date(file.$updatedAt) > new Date(totalSpace[fileType].latestDate)
+    ) {
+      totalSpace[fileType].latestDate = file.$updatedAt;
+    }
+  });
+  return parseStringify(totalSpace);
+}
