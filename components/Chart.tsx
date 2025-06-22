@@ -31,7 +31,7 @@ export const Chart = ({ used = 0 }: { used?: number }) => {
   const chartData = [{ storage: "used", 10: used, fill: "white" }];
 
   return (
-    <Card className="flex items-center rounded-[20px] bg-brand p-5 text-white md:flex-col xl:flex-row">
+    <Card className="flex items-center rounded-[20px] bg-brand p-5 text-white flex-row">
       <CardContent className="flex-1 p-0">
         <ChartContainer
           config={chartConfig}

@@ -22,7 +22,7 @@ const Dashboard = async () => {
       <section>
         <Chart used={totalSpace.used} />
 
-        <ul className="mt-6 grid grid-cols-1 gap-4 xl:mt-10 xl:grid-cols-2 xl:gap-9">
+        <ul className="mt-6 grid gap-4 md:mt-10 grid-cols-2 xl:gap-9">
           {usageSummary.map((summary) => (
             <Link
               href={summary.url}
@@ -53,7 +53,6 @@ const Dashboard = async () => {
           ))}
         </ul>
       </section>
-
       {/* Recent files uploaded */}
       <section className="h-full rounded-[20px] bg-white p-5 xl:p-8">
         <h2 className="h3 xl:h2 text-light-100">Recent files uploaded</h2>
@@ -72,7 +71,7 @@ const Dashboard = async () => {
                   url={file.url}
                 />
 
-                <div className="flex w-full flex-col xl:flex-row xl:justify-between">
+                <div className="flex w-full flex-row justify-between">
                   <div className="flex flex-col gap-1">
                     <p className="subtitle-2 line-clamp-1 w-full text-light-100 sm:max-w-[200px] lg:max-w-[250px] ">
                       {file.name}
@@ -96,4 +95,5 @@ const Dashboard = async () => {
     </div>
   );
 };
+
 export default Dashboard;

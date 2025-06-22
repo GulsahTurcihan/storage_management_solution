@@ -162,9 +162,10 @@ const ActionDropdown = ({ file }: { file: Models.Document }) => {
             alt="dropDown-icon"
             width={34}
             height={34}
+            className="hover:cursor-pointer"
           />
         </DropdownMenuTrigger>
-        <DropdownMenuContent>
+        <DropdownMenuContent className="mr-8 md:mr-[5.20rem] xl:mr-[5.75rem]">
           <DropdownMenuLabel className="w-64 max-w-[200px] truncate">
             {file.name}
           </DropdownMenuLabel>
